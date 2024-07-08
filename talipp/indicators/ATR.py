@@ -2,6 +2,7 @@ from typing import List, Any
 
 from talipp.indicator_util import has_valid_values
 from talipp.indicators.Indicator import Indicator, InputModifierType
+from talipp.indicators.WilderMA import WilderMA
 from talipp.input import SamplingPeriodType
 from talipp.ohlcv import OHLCV
 
@@ -30,6 +31,7 @@ class ATR(Indicator):
                                   input_sampling=input_sampling)
 
         self.period = period
+        self._ma_tr = WilderMA(period)
         self.tr = []
 
         self.add_managed_sequence(self.tr)
@@ -41,18 +43,29 @@ class ATR(Indicator):
         low = self.input_values[-1].low
 
         if has_valid_values(self.input_values, 1, exact=True):
+            tr = high - low
             self.tr.append(high - low)
         else:
             close2 = self.input_values[-2].close
-            self.tr.append(max(
+            tr = max(
                 high - low,
                 abs(high - close2),
                 abs(low - close2),
-            ))
+            )
+            self.tr.append(tr)
 
+        self._ma_tr.add(tr)
+
+        return self._ma_tr[-1]
         if len(self.input_values) < self.period:
+            assert self._ma_tr[-1] is None, "Eror"
+
             return None
         elif len(self.input_values) == self.period:
+            print("b1", self._ma_tr[-1])
+            print("b2", sum(self.tr) / self.period)
             return sum(self.tr) / self.period
         else:
+            print("a1", self._ma_tr[-1])
+            print("a2", (self.output_values[-1] * (self.period - 1) + self.tr[-1]) / self.period)
             return (self.output_values[-1] * (self.period - 1) + self.tr[-1]) / self.period

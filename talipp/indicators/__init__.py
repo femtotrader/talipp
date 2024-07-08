@@ -53,6 +53,7 @@ from .UO import UO as UO
 from .VTX import VTX as VTX
 from .VWAP import VWAP as VWAP
 from .VWMA import VWMA as VWMA
+from .WilderMA import WilderMA as WilderMA
 from .WMA import WMA as WMA
 from .ZigZag import ZigZag as ZigZag
 from .ZLEMA import ZLEMA as ZLEMA
